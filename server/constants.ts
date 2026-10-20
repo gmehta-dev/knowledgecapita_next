@@ -108,3 +108,40 @@ export const AUTHORIZED_EMAILS = [
   "gmehta.dev@gmail.com"
 ];
 
+
+// Labels offered by the UI dropdowns (public/content.json) and stored on existing
+// users since the Laravel era, but missing from the lists above, so the legacy
+// API rejected them ("Invalid designation") and those users could not save
+// their profile. Accepted in addition to the values above.
+const UI_DESIGNATIONS = [
+  "Chief Executive Officer (CEO)",
+  "Chief Financial Officer (CFO)",
+  "Chief Human Resource Officer (CHRO)",
+  "Chief Information Officer (CIO)",
+  "Chief Information Security Officer (CISO)",
+  "Chief Innovation Officer (CIO)",
+  "Chief Investment Officer (CIO)",
+  "Chief Marketing Officer (CMO)",
+  "Chief Operating Officer (COO)",
+  "Chief Quality Officer (CQO)",
+  "Chief Scientific Officer (CSO)",
+  "Chief Sustainability Officer (CSO)",
+  "Chief Strategy Officer (CSO)",
+  "Chief Technology Officer (CTO)",
+  "Head- EHS",
+  "Vice- Chancellor"
+];
+
+const UI_INDUSTRIES = [
+  "BFSI, Investment & Trading",
+  "NGO/ Social Services",
+  "Sports, Fitness & Personal Care"
+];
+
+const UI_SPECIALIZATIONS = [
+  "Environment, Health & Safety"
+];
+
+DESIGNATIONS.push(...UI_DESIGNATIONS);
+INDUSTRIES.push(...UI_INDUSTRIES);
+SPECIALIZATIONS.push(...UI_SPECIALIZATIONS);

@@ -226,3 +226,47 @@ describe('delete', () => {
     assert.equal(left, 0);
   });
 });
+
+describe('profile dropdowns (Next.js fix: legacy API rejected 20 UI options)', () => {
+  it('every option offered by public/content.json can be saved', async () => {
+    const { readFileSync } = await import('node:fs');
+    const dd = JSON.parse(readFileSync(new URL('../../public/content.json', import.meta.url))).dropdowns;
+    const longest = Math.max(dd.designation.length, dd.industry.length, dd.area_of_specialization.length);
+    const failures = [];
+    for (let i = 0; i < longest; i++) {
+      const body = {
+        name: 'Dropdown Check',
+        designation: dd.designation[i % dd.designation.length],
+        industry: dd.industry[i % dd.industry.length],
+        area_of_specialization: dd.area_of_specialization[i % dd.area_of_specialization.length],
+        brief_bio: '<p>x</p>'
+      };
+      const r = await call('POST', '/user/profile', { token: s.userToken, body });
+      if (r.status !== 200) failures.push(`${JSON.stringify(body)} -> ${r.status} ${JSON.stringify(r.json?.errors)}`);
+    }
+    assert.deepEqual(failures, []);
+  });
+});
+
+describe('uploaded files saved with a type prefix (Next.js fix)', () => {
+  it('serves /storage/profile/profile/<file> and /storage/bioFile/bioFile/<file>', async () => {
+    const { PNG_1PX } = await import('./fixtures.mjs');
+    for (const [type, bytes, name, mime] of [
+      ['profile', PNG_1PX, 'p.png', 'image/png'],
+      ['bioFile', Buffer.from('%PDF-1.4\n%%EOF'), 'cv.pdf', 'application/pdf']
+    ]) {
+      const form = new FormData();
+      form.append('type', type);
+      form.append('file', new Blob([bytes], { type: mime }), name);
+      const up = await fetch(BASE + '/upload-image', { method: 'POST', headers: { Authorization: `Bearer ${s.userToken}` }, body: form }).then((r) => r.json());
+      assert.match(up.image, new RegExp(`^${type}/`));
+      // exactly how the UI builds the URL: mediaUrl ('/storage/<type>/') + stored value
+      const res = await fetch(`${BASE}/storage/${type}/${up.image}`);
+      assert.equal(res.status, 200, `${type}/${up.image}`);
+      assert.deepEqual(Buffer.from(await res.arrayBuffer()), Buffer.from(bytes));
+    }
+    // other path tricks still rejected
+    assert.equal((await fetch(`${BASE}/storage/profile/bioFile/x.pdf`)).status, 404);
+    assert.equal((await fetch(`${BASE}/storage/profile/profile/..%2F..%2F.env`)).status, 404);
+  });
+});

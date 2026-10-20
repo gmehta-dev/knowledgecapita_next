@@ -107,6 +107,11 @@ const notFound = () => json({ message: 'Route not found' }, 404);
 
 /** Replacement for `express.static('storage')`, limited to the upload folders. */
 export async function serveStoredFile(req: NextRequest, segments: string[], headOnly = false) {
+  // Uploads return `profile/<file>` and the frontend stores that value, but builds
+  // URLs as `<media>/profile/` + value, so newer records resolve to
+  // `profile/profile/<file>`. Accept the doubled prefix so they display.
+  if (segments.length > 2 && segments[0] === segments[1]) segments = segments.slice(1);
+
   if (segments.length < 2 || !(UPLOAD_TYPES as readonly string[]).includes(segments[0])) return notFound();
   if (segments.some((s) => !s || s.startsWith('.') || s.includes('/') || s.includes('\\') || s.includes('\0'))) {
     return notFound();
