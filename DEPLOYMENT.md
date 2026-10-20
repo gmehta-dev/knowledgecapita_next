@@ -46,9 +46,15 @@ during the transition and rollback needs no file copy.
 
 ## 3. Run alongside the old app (staging)
 
+The standalone server picks its port and host **before** it reads env files, so
+`PORT`/`HOSTNAME` must come from the process environment. Check the port is free
+first (`ss -ltnp | grep :3100`) – other apps on the server may already use it.
+
 ```bash
-pm2 start .next/standalone/server.js --name knowledgecapita-next
+PORT=3100 HOSTNAME=127.0.0.1 pm2 start .next/standalone/server.js --name knowledgecapita-next
+pm2 save
 curl -s http://127.0.0.1:3100/api/health
+curl -s http://127.0.0.1:3100/ | grep -o "<title>[^<]*</title>"   # must say KNOWLEDGE CAPITA
 ```
 
 Expose it on a staging host (e.g. `next.knowledgecapita.com`) and smoke test:
