@@ -18,16 +18,15 @@ export function middleware(req: NextRequest) {
   // Legacy profile URL /profile-detail?pid=<id> -> permanent redirect to the SEO URL.
   // /profile/<id> then redirects to /profile/<name-slug>-<id>. Done here (not in the
   // page) so crawlers get a real HTTP 308 instead of a client-side redirect.
+  // Built on SITE_URL: behind a reverse proxy req.nextUrl holds the internal host
+  // (e.g. localhost:3110), which must never leak into a redirect.
   if (req.nextUrl.pathname === '/profile-detail') {
+    const base = process.env.SITE_URL || req.nextUrl.origin;
     const pid = req.nextUrl.searchParams.get('pid');
-    const url = req.nextUrl.clone();
-    url.search = '';
     if (pid && /^[a-f0-9]{24}$/i.test(pid)) {
-      url.pathname = `/profile/${pid.toLowerCase()}`;
-      return NextResponse.redirect(url, 308);
+      return NextResponse.redirect(new URL(`/profile/${pid.toLowerCase()}`, base), 308);
     }
-    url.pathname = '/';
-    return NextResponse.redirect(url, 307);
+    return NextResponse.redirect(new URL('/', base), 307);
   }
 
   const origin = req.headers.get('origin');
