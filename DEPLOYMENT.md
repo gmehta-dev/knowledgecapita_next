@@ -30,6 +30,7 @@ JWT_EXPIRES_IN=7d
 STORAGE_PATH=/var/www/knowledgeCapita-API/src/storage   # existing uploads, shared
 ALLOWED_ORIGINS=https://knowledgecapita.com
 MONGODB_AUTO_INDEX=false
+SITE_URL=https://knowledgecapita.com
 ```
 
 The standalone server loads env files from its own folder, so after every build:

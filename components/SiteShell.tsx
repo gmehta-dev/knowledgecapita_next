@@ -24,6 +24,9 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
     const [contentData, setContentData] = useState<any>(null)
     const [authData, setAuthData] = useState<AuthData | null>(null)
 
+    // Public, auth-independent pages that are rendered on the server (SEO).
+    const serverRendered = pathname?.startsWith("/profile/") ?? false
+
     // Auth lives in localStorage/sessionStorage, so pages render in the browser only
     // (as with the CRA app); re-check on every navigation like MainLayout did.
     useEffect(() => {
@@ -47,10 +50,10 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
     return (
         <SiteLayoutContext.Provider value={{ isLoader, setIsLoader, isUserLoggedIn, setIsUserLoggedIn, isSuperAdmin, contentData, authData }}>
             <div className="main-layout">
-                {(isLoader || !mounted) && <FullScreenLoader />}
+                {(isLoader || (!mounted && !serverRendered)) && <FullScreenLoader />}
                 <Header isUserLoggedIn={isUserLoggedIn} isSuperAdmin={isUserLoggedIn && isSuperAdmin} />
                 <main className="main-content">
-                    {mounted && children}
+                    {(mounted || serverRendered) && children}
                 </main>
                 <Footer />
             </div>

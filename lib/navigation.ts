@@ -11,7 +11,9 @@ export function useNavigate() {
     const router = useRouter();
     return useCallback((to: string | number) => {
         if (typeof to === "number") {
-            router.back();
+            // Visitors arriving directly (e.g. from search) have no in-site history.
+            if (window.history.length > 1) router.back();
+            else router.push("/");
             return;
         }
         router.push(to.startsWith("/") ? to : `/${to}`);

@@ -3,46 +3,39 @@
 import { useEffect, useState, useCallback } from "react"
 import { axiosInstance } from "@/lib/axios-config"
 import { useNavigate } from "@/lib/navigation";
-import { useSearchParams } from "next/navigation";
 import { convertDate, getFileIcon, mediaUrl, mediaUrlBioFile, replaceLogo } from "@/lib/helper"
-import Auth from "@/lib/Auth"
 
-type udType = { name: string; industry: string; email: string; designation: string; profile_image: string; calender: string; brief_bio: string; experience: string; detailed_bio: string; scheduling_assistance: string; area_of_specialization: string; calender_visibility: string; user_calender: any[] }
+type udType = { name: string; industry: string; email?: string; designation: string; profile_image: string; calender: string; brief_bio: string; experience: string; detailed_bio: string; scheduling_assistance: string; area_of_specialization: string; calender_visibility: string; user_calender: any[] }
 type CalenderForm = { city: string; time: string; from_date: string; to_date: string; interested_to_meet: string }
 
-export default function ProfileDetail() {
-    const searchParams = useSearchParams()
-    const navigate = useNavigate()
-    const loggedUser = Auth.loggedInUser()
-    const [userDetail, setUserDetail] = useState<udType>()
-    const [activeTab, setActiveTab] = useState('briefBio')
-    const [isLoading, setIsLoading] = useState(true)
+const sortCalendar = (data: udType): udType => ({
+    ...data,
+    user_calender: [...(data.user_calender || [])].sort((a: CalenderForm, b: CalenderForm) => new Date(b.from_date).getTime() - new Date(a.from_date).getTime())
+})
 
-    const pid = searchParams.get("pid")
-    const userId = loggedUser?.id
+/**
+ * Profile page. Rendered on the server with `initialData` from /profile/[slug];
+ * falls back to fetching `dashboard/:pid` in the browser when no data is given.
+ */
+export default function ProfileDetail({ pid, initialData }: { pid: string; initialData?: udType }) {
+    const navigate = useNavigate()
+    const [userDetail, setUserDetail] = useState<udType | undefined>(initialData ? sortCalendar(initialData) : undefined)
+    const [activeTab, setActiveTab] = useState("briefBio")
+    const [isLoading, setIsLoading] = useState(!initialData)
 
     const userGetByIdHandler = useCallback(() => {
-        if (!pid) return
         setIsLoading(true)
-        let apiUrl = `dashboard/${pid}`
-        if (userId) apiUrl += `?userId=${userId}`
-        axiosInstance.get(apiUrl).then((response) => {
-            const sorted = response.data.user_calender?.sort((a: CalenderForm, b: CalenderForm) => new Date(b.from_date).getTime() - new Date(a.from_date).getTime())
-            setUserDetail({ ...response.data, user_calender: sorted || [] })
+        axiosInstance.get(`dashboard/${pid}`).then((response) => {
+            setUserDetail(sortCalendar(response.data))
             setIsLoading(false)
         }).catch(() => setIsLoading(false))
-    }, [pid, userId])
+    }, [pid])
 
     useEffect(() => {
-        if (!pid) {
-            navigate('/')
-            return
-        }
-        userGetByIdHandler()
+        if (!initialData) userGetByIdHandler()
         window.scrollTo(0, 0)
-    }, [pid, navigate, userGetByIdHandler])
+    }, [initialData, userGetByIdHandler])
 
-    useEffect(() => { document.title = `${userDetail?.name || 'Profile'} | KNOWLEDGE CAPITA` }, [userDetail?.name])
 
     const tabs = [
         { id: 'briefBio', label: 'Brief Bio', icon: '📋' },

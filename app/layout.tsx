@@ -1,10 +1,18 @@
 import type { Metadata, Viewport } from "next";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 import "@/styles/app.scss";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://knowledgecapita.com"),
-  title: { default: "KNOWLEDGE CAPITA", template: "%s | KNOWLEDGE CAPITA" },
+  metadataBase: new URL(SITE_URL),
+  title: { default: SITE_NAME, template: `%s | ${SITE_NAME}` },
   description: "ShareCom Amplifying KNOWLEDGE CAPITA of the World",
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: "ShareCom Amplifying KNOWLEDGE CAPITA of the World",
+    images: [{ url: "/assets/images/logo.png", alt: SITE_NAME }],
+  },
   manifest: "/manifest.json",
   icons: { icon: "/favicon.ico" },
 };

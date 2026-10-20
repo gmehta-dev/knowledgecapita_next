@@ -154,3 +154,43 @@ to see the Admin menu.
 anonymous/users/activities admins, list/search/pagination, update (incl. email
 change, password reset, promote/demote), self-protection, delete with calendar
 cleanup.
+
+## SEO-friendly URLs
+
+| Before | After |
+|---|---|
+| `/profile-detail?pid=<id>` (client-rendered, empty HTML for crawlers) | `/profile/<name-slug>-<id>` server-rendered |
+| static `public/sitemap.xml` (2024, listed private pages) | `app/sitemap.ts`: home, about, contact + every visible profile, live from the DB |
+| `robots.txt` allowing everything | `app/robots.ts`: blocks `/api/` (except profile photos), `/admin/`, `/myaccount`, `/register`, `/calender`; links the sitemap |
+
+- **Redirects:** `/profile-detail?pid=<id>` → 308 → `/profile/<id>` → 308 → `/profile/<name>-<id>`
+  (done in `middleware.ts` so crawlers get real HTTP redirects). Outdated slugs (renamed users)
+  also 308 to the current one. Old links, bookmarks and indexed URLs keep working.
+- **Profile pages** render on the server with the same visibility rules as `GET /api/dashboard/:pid`
+  (shared `server/profiles.ts`), plus title, meta description (from role and brief bio),
+  canonical URL, Open Graph/Twitter tags with the profile photo, and schema.org `Person` JSON-LD.
+- Hidden profiles (`profile_visibility: 0`) are reachable by link as before but marked `noindex`
+  and left out of the sitemap. The email is not included in the server HTML.
+- Directory "View Profile" is now a real link (crawlable, opens in a new tab with middle-click).
+- `SITE_URL` (server env, default `https://knowledgecapita.com`) is used for canonical/sitemap URLs.
+- Tests: `npm run test:seo` (11).
+
+## Live bugs fixed during pre-deploy testing
+
+Both exist on the current production site; fixed here, with tests:
+
+1. **Profile save rejected for 20 dropdown options.** The UI offers labels such as
+   "Chief Executive Officer (CEO)", "BFSI, Investment & Trading", "Environment, Health & Safety";
+   the API only accepted "CEO", "BFSI Investment & Trading", … → "Invalid designation".
+   Existing users already hold these values. Fix: the API accepts both forms (additive).
+2. **Newly uploaded photos/CVs show as broken.** Upload returns `profile/<file>`, the UI stores it
+   and then builds `/storage/profile/` + value → `/storage/profile/profile/<file>` (404). Fix: storage
+   route accepts the doubled prefix, so existing production records display without a data change.
+
+Also: Next.js 15.5.4 → 15.5.28 (critical/high security advisories), `react-toastify` 9 → 11
+(v9 crashed the page on React 19 whenever a toast was shown).
+
+Remaining known quirks (unchanged from the live site): any 401, including a wrong password on
+login, reloads to the home page after 1 second; an invalid `?pid` shows an empty profile shell
+(now: 404 page). Quill 2.0.3 has a low-severity advisory in `getSemanticHTML`, which the editors
+no longer call (`useSemanticHTML={false}`, same HTML as the legacy editor).

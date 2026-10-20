@@ -2,7 +2,7 @@ import 'server-only';
 import type { NextRequest } from 'next/server';
 import mongoose from 'mongoose';
 import User from '../models/User';
-import CalendarEntry from '../models/CalendarEntry';
+import { buildPublicProfile } from '../profiles';
 import { assertObjectId, json } from '../http';
 
 // GET /dashboard
@@ -63,46 +63,7 @@ export async function getUserById(_req: NextRequest, pid: string) {
   }
 
   // Build response respecting visibility settings
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const data: Record<string, any> = {
-    id: user._id,
-    name: user.name,
-    email: user.email,
-    designation: user.designation,
-    industry: user.industry,
-    area_of_specialization: user.area_of_specialization,
-    profile_image: user.profile_image
-  };
-
-  // Add fields based on visibility
-  if (user.brief_bio_visibility === 1) {
-    data.brief_bio = user.brief_bio;
-  }
-  if (user.experience_visibility === 1) {
-    data.experience = user.experience;
-  }
-  if (user.detailed_bio_visibility === 1) {
-    data.detailed_bio = user.detailed_bio;
-  }
-  if (user.scheduling_visibility === 1) {
-    data.scheduling_assistance = user.scheduling_assistance;
-  }
-
-  data.calender_visibility = user.calender_visibility;
-
-  // Include calendar entries if visible
-  if (user.calender_visibility === 1) {
-    const calendarEntries = await CalendarEntry.find({ user_id: user._id }).lean();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data.user_calender = calendarEntries.map((entry: any) => ({
-      id: entry._id,
-      city: entry.city,
-      time: entry.time,
-      from_date: entry.from_date,
-      to_date: entry.to_date,
-      interested_to_meet: entry.interested_to_meet
-    }));
-  }
+  const data = await buildPublicProfile(user);
 
   return json({ data });
 }

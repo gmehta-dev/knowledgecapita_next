@@ -15,6 +15,21 @@ function allowedOrigins(): string[] {
 }
 
 export function middleware(req: NextRequest) {
+  // Legacy profile URL /profile-detail?pid=<id> -> permanent redirect to the SEO URL.
+  // /profile/<id> then redirects to /profile/<name-slug>-<id>. Done here (not in the
+  // page) so crawlers get a real HTTP 308 instead of a client-side redirect.
+  if (req.nextUrl.pathname === '/profile-detail') {
+    const pid = req.nextUrl.searchParams.get('pid');
+    const url = req.nextUrl.clone();
+    url.search = '';
+    if (pid && /^[a-f0-9]{24}$/i.test(pid)) {
+      url.pathname = `/profile/${pid.toLowerCase()}`;
+      return NextResponse.redirect(url, 308);
+    }
+    url.pathname = '/';
+    return NextResponse.redirect(url, 307);
+  }
+
   const origin = req.headers.get('origin');
   const allowed = origin && allowedOrigins().includes(origin) ? origin : null;
 
@@ -38,5 +53,5 @@ export function middleware(req: NextRequest) {
 export const config = {
   // Default (edge) runtime: it streams request bodies, whereas the nodejs middleware
   // runtime buffers them with a size cap that truncates file uploads.
-  matcher: '/api/:path*'
+  matcher: ['/api/:path*', '/profile-detail']
 };

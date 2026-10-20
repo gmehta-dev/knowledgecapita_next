@@ -2,7 +2,8 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { axiosInstance } from "@/lib/axios-config"
-import { useNavigate } from "@/lib/navigation";
+import Link from "next/link";
+import { profilePath } from "@/lib/slug";
 import { useLayoutContext } from "@/lib/layout-context";
 import { mediaUrl, replaceLogo } from "@/lib/helper";
 import Auth from "@/lib/Auth";
@@ -98,7 +99,6 @@ export default function HomePage() {
     const { contentData, authData } = useLayoutContext<LayoutContext>()
 
     const loggedInUser = Auth.loggedInUser();
-    const navigate = useNavigate()
     const [userList, setUserList] = useState<uList[]>();
     const [searchText, setSearchText] = useState<string>();
     const [page, setPage] = useState<number>(1);
@@ -323,13 +323,12 @@ export default function HomePage() {
                                             <span className="d-md-none">, </span>
                                             {ul.area_of_specialization}
                                         </p>
-                                        <button
-                                            type="button"
-                                            onClick={() => navigate(`/profile-detail?pid=${ul.id}`)}
+                                        <Link
+                                            href={profilePath(String(ul.id), ul.name)}
                                             className="btn btn-sm bg-danger text-white w-100"
                                         >
                                             View Profile
-                                        </button>
+                                        </Link>
                                     </div>
                                 </div>
                             </div>
