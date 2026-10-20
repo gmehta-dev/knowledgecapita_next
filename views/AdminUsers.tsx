@@ -294,6 +294,8 @@ export default function AdminUsersPage() {
                                 <div className="col-12 mb-3">
                                     <label className="form-label small fw-semibold mb-1">Brief bio</label>
                                     <ReactQuill
+                                        // Same HTML as the legacy react-quill (root.innerHTML); avoids Quill 2.0.3 getSemanticHTML XSS.
+                                        useSemanticHTML={false}
                                         className="edit-class"
                                         theme="snow"
                                         value={watch("brief_bio")}

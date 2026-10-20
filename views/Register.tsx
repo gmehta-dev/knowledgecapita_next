@@ -346,6 +346,8 @@ export default function RegisterPage() {
                                         </label>
                                         <p className="text-muted small mb-2">Write a short introduction about yourself</p>
                                         <ReactQuill
+                                            // Same HTML as the legacy react-quill (root.innerHTML); avoids Quill 2.0.3 getSemanticHTML XSS.
+                                            useSemanticHTML={false}
                                             className="edit-class"
                                             theme="snow"
                                             value={getValues('brief_bio')}
@@ -360,6 +362,8 @@ export default function RegisterPage() {
                                         <label className="form-label small fw-semibold mb-1">Experience</label>
                                         <p className="text-muted small mb-2">Describe your professional experience</p>
                                         <ReactQuill
+                                            // Same HTML as the legacy react-quill (root.innerHTML); avoids Quill 2.0.3 getSemanticHTML XSS.
+                                            useSemanticHTML={false}
                                             className="edit-class"
                                             theme="snow"
                                             value={getValues('experience')}
