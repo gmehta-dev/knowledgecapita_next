@@ -209,7 +209,6 @@ export default function HomePage() {
                                     disabled={islistLoading}
                                     onChange={(event) => setFilterD(event.target.value)}
                                     value={filterD}
-                                    defaultValue=''
                                     name="designation"
                                     className="filter-select"
                                 >
