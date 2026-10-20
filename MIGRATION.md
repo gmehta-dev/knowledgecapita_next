@@ -87,7 +87,7 @@ These exist in the live app today and were deliberately **not** changed:
    "PhD Scholar only" restriction for non-admins is enforced only in the browser.
 2. `GET /api/dashboard/:pid` always returns `email`; `name_visibility` is never applied.
 3. `searching` is passed to MongoDB `$regex` unescaped (slow-query / regex injection).
-4. `POST /api/auth/pass-reset` does not send an email (TODO in legacy code).
+4. ~~`POST /api/auth/pass-reset` does not send an email (TODO in legacy code).~~ Fixed, see *Email* below.
 5. "Remember me" off → session stored in sessionStorage, which is lost after a reload.
 6. Admin emails are duplicated in `public/authData.json` and `server/constants.ts`
    (the server copy is the one enforced).
@@ -194,3 +194,19 @@ Remaining known quirks (unchanged from the live site): any 401, including a wron
 login, reloads to the home page after 1 second; an invalid `?pid` shows an empty profile shell
 (now: 404 page). Quill 2.0.3 has a low-severity advisory in `getSemanticHTML`, which the editors
 no longer call (`useSemanticHTML={false}`, same HTML as the legacy editor).
+
+## Email (added after the migration)
+
+Sent over SMTP (Gmail App Password) by `server/mail.ts`; configured with
+`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, optional `MAIL_FROM` and
+`CONTACT_NOTIFY_TO` (see `.env.example`). Without `SMTP_HOST` nothing is sent and
+a `[mail]` warning is logged; a mail failure never fails the request.
+
+| Trigger | Email |
+| --- | --- |
+| `POST /api/auth/sign-up` (201) | Welcome email to the new member. |
+| `POST /api/auth/pass-reset` | One-time link `SITE_URL/reset-password?token=…`, valid 1 hour, at most one per account every 2 minutes. Same response whether or not the email exists. Only a SHA-256 of the token is stored (`users.password_reset_token` / `password_reset_expires`, new optional fields, `select: false`). |
+| `POST /api/auth/pass-reset/confirm` `{token, password, password_confirmation}` | No email. Sets the password and consumes the token atomically: 200, 400 for an invalid/expired/used link, 422 for validation. |
+| `POST /api/contact` | Notification to `CONTACT_NOTIFY_TO` (default `SMTP_USER`) with Reply-To set to the sender. The message is still saved in `contactmessages` first. |
+
+Tests: `npm run test:email` (captures mail with a local SMTP sink; see the file header).

@@ -45,6 +45,11 @@ const userSchema = new mongoose.Schema({
     default: 'user'
   },
 
+  // Password reset (added with email support). SHA-256 of the emailed one-time token,
+  // never the token itself. Absent on existing documents; no data migration needed.
+  password_reset_token: { type: String, select: false },
+  password_reset_expires: { type: Date, select: false },
+
   // Visibility settings (0 = hidden, 1 = visible)
   name_visibility: { type: Number, default: 1 },
   profile_visibility: { type: Number, default: 1 },

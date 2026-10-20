@@ -59,9 +59,29 @@ const passChangeSchema = Joi.object({
   })
 });
 
+const passResetConfirmSchema = Joi.object({
+  token: Joi.string().hex().length(64).required().messages({
+    'any.required': 'Reset link is invalid',
+    'string.empty': 'Reset link is invalid',
+    'string.hex': 'Reset link is invalid',
+    'string.length': 'Reset link is invalid'
+  }),
+  password: Joi.string().min(8).required().messages({
+    'any.required': 'Password is required',
+    'string.min': 'Password must be at least 8 characters',
+    'string.empty': 'Password is required'
+  }),
+  password_confirmation: Joi.string().valid(Joi.ref('password')).required().messages({
+    'any.required': 'Password confirmation is required',
+    'any.only': 'Password confirmation must match password',
+    'string.empty': 'Password confirmation is required'
+  })
+});
+
 export {
   signUpSchema,
   signInSchema,
   passResetSchema,
+  passResetConfirmSchema,
   passChangeSchema
 };

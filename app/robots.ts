@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
             userAgent: "*",
             // Profile photos may appear in image search; the rest of the API and private pages may not.
             allow: ["/", "/api/storage/profile/"],
-            disallow: ["/api/", "/admin/", "/myaccount", "/register", "/calender"],
+            disallow: ["/api/", "/admin/", "/myaccount", "/register", "/calender", "/reset-password"],
         },
         sitemap: `${SITE_URL}/sitemap.xml`,
         host: SITE_URL,

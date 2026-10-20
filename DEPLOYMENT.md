@@ -31,6 +31,12 @@ STORAGE_PATH=/var/www/knowledgeCapita-API/src/storage   # existing uploads, shar
 ALLOWED_ORIGINS=https://knowledgecapita.com
 MONGODB_AUTO_INDEX=false
 SITE_URL=https://knowledgecapita.com
+# Email (Gmail App Password, https://myaccount.google.com/apppasswords, no spaces)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_USER=<gmail address>
+SMTP_PASS=<16-character app password>
+CONTACT_NOTIFY_TO=<where contact form messages go, default SMTP_USER>
 ```
 
 The standalone server loads env files from its own folder, so after every build:
