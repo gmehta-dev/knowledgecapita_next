@@ -142,7 +142,8 @@ describe('auth', () => {
     assert.equal(r.status, 200);
     assert.equal(r.json.message, 'Login successful');
     assert.equal(typeof r.json.token, 'string');
-    assert.deepEqual(Object.keys(r.json.user).sort(), [
+    // 'role' is an additive field introduced by the Next.js app (absent in legacy Express).
+    assert.deepEqual(Object.keys(r.json.user).filter((k) => k !== 'role').sort(), [
       'area_of_specialization', 'designation', 'email', 'id', 'industry', 'name', 'phone_number', 'profile_image'
     ]);
     assert.equal(r.json.user.email, USER.email);

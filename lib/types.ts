@@ -9,6 +9,7 @@ export interface User {
     industry?: string
     area_of_specialization?: string
     profile_image?: string
+    role?: "user" | "super_admin"
 }
 
 export interface AuthResponse {
@@ -21,6 +22,7 @@ export interface LayoutContext {
     setIsLoader: (value: boolean) => void
     isUserLoggedIn: boolean
     setIsUserLoggedIn: (value: boolean) => void
+    isSuperAdmin?: boolean
     contentData: { dropdowns?: DropdownData; about?: AboutData } | null
     authData: AuthData | null
 }

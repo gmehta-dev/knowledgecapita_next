@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import "react-toastify/dist/ReactToastify.css";
 import "@/styles/app.scss";
 
 export const metadata: Metadata = {

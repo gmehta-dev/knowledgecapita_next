@@ -37,6 +37,14 @@ const userSchema = new mongoose.Schema({
     maxlength: 100
   },
 
+  // Added in the Next.js migration. Missing on existing documents = 'user' (no data migration needed).
+  // Promote with scripts/make-super-admin.mjs; never settable via sign-up or profile update.
+  role: {
+    type: String,
+    enum: ['user', 'super_admin'],
+    default: 'user'
+  },
+
   // Visibility settings (0 = hidden, 1 = visible)
   name_visibility: { type: Number, default: 1 },
   profile_visibility: { type: Number, default: 1 },

@@ -54,6 +54,7 @@ legacy Express API **and** the Next.js app (dev and production build).
   redirects home.
 - `react-quill` → `react-quill-new` (same API; `react-quill` does not work on
   React 19, which the App Router requires). Loaded client-side only.
+- `react-toastify` 9 → 11 (v9 crashes on React 19 when a toast is shown; same `toast.*` API, CSS now injected automatically).
 - `lib/Auth.ts` guarded for server rendering; behaviour unchanged.
 - `public/content.json` / `authData.json` are still fetched at runtime, so they
   can be edited on the server without rebuilding.
@@ -104,3 +105,52 @@ API_BASE=http://localhost:4101 npm run test:contract
 ```
 
 Run `npm run test:db` before each run; the suite creates users/entries.
+
+## New feature: super admin (user management)
+
+Only users with `role: "super_admin"` can manage users. Regular users and the
+activities admins (`AUTHORIZED_EMAILS`) get **403**.
+
+| Endpoint | Purpose |
+|---|---|
+| `GET /api/admin/users?page=&size=&searching=` | All users, including hidden profiles, with email/phone/role. Search matches name, email or phone (literal, not regex). `size` ≤ 100. |
+| `GET /api/admin/users/:id` | Full user (no password) |
+| `PUT /api/admin/users/:id` | Update any subset of: name, email, phone_number, password (reset), role, designation, industry, area_of_specialization, bios, scheduling_assistance, profile_image, `*_visibility`. Duplicate email/phone → 400 like sign-up. |
+| `DELETE /api/admin/users/:id` | Deletes the user **and their calendar entries**. Uploaded files and activities they created are kept. |
+
+UI: **Admin** link in the header (super admins only) → `/admin/users`
+(search, pagination, edit dialog, delete). The edit dialog sends only changed
+fields, so legacy values that are no longer in the dropdown lists are not re-validated.
+
+Safety rules:
+- Nobody can make themselves super admin: `role` is rejected by sign-up and profile update (422).
+- A super admin cannot delete themselves or remove their own role, so there is always at least one.
+- The role is re-read from the database on every request, so a demotion takes effect immediately.
+- Every update and delete is logged: `[admin] user <id> updated by <email>: <fields>` / `... deleted by ...`.
+
+### Database impact
+
+One **optional** field, `role` (`"user"` | `"super_admin"`), on `users`. Existing
+documents are not touched: a missing value is treated as `"user"`. The legacy
+Express API ignores the field and keeps working on the same database (verified:
+the full contract suite passes against Express with `role` present).
+
+### Creating the first super admin
+
+There is no UI or API for this on purpose. On the server:
+
+```bash
+MONGODB_URI='<production uri>' node scripts/make-super-admin.mjs someone@example.com
+# shows database, user and role change, then asks "Apply this change? (yes/no)"
+MONGODB_URI='<production uri>' node scripts/make-super-admin.mjs someone@example.com --revoke
+```
+
+It changes exactly one field on one user. The user must log out and back in
+to see the Admin menu.
+
+### Tests
+
+`npm run test:admin` (20 tests, Next.js only): role checks, 401/403 for
+anonymous/users/activities admins, list/search/pagination, update (incl. email
+change, password reset, promote/demote), self-protection, delete with calendar
+cleanup.

@@ -59,6 +59,16 @@ For contract tests against staging, use a **staging copy** of the database
 (`mongodump` → `mongorestore` into a `*_test` DB). Never run the contract suite
 against production — it creates users and records.
 
+### 3b. Create the first super admin
+
+The only write this migration makes to production data, and only when you run it
+(it shows the change and asks for confirmation):
+
+```bash
+cd /var/www/knowledgecapita-next
+MONGODB_URI='<production uri>' node scripts/make-super-admin.mjs you@example.com
+```
+
 ## 4. Cutover
 
 Point the proxy at the Next.js process for **all** paths (pages and `/api/*`):

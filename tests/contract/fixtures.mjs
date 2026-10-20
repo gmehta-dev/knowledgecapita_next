@@ -10,3 +10,9 @@ export const PNG_1PX = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
   'base64'
 );
+
+export const SUPER_ADMIN = {
+  email: 'contract.superadmin@example.com',
+  phone_number: '9000000002',
+  password: 'contract-super-pass'
+};

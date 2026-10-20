@@ -51,3 +51,13 @@ export function assertCanManageActivities(user: any): void {
     throw new ApiError(403, 'Not authorized');
   }
 }
+
+export const SUPER_ADMIN = 'super_admin';
+
+/** Only users with role `super_admin` may manage other users. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function assertSuperAdmin(user: any): void {
+  if (user.role !== SUPER_ADMIN) {
+    throw new ApiError(403, 'Not authorized');
+  }
+}

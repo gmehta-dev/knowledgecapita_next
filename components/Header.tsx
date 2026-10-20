@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export default function Header(props: any) {
-    const { isUserLoggedIn } = props
+    const { isUserLoggedIn, isSuperAdmin } = props
     const pathname = usePathname()
     const [mobileView, setMobileview] = useState<boolean>(false)
     const [isScrolled, setIsScrolled] = useState<boolean>(false)
@@ -94,6 +94,14 @@ export default function Header(props: any) {
                                 >
                                     Contact Us
                                 </Link>
+                                {isSuperAdmin &&
+                                    <Link
+                                        href="/admin/users"
+                                        className={`${linkClasses} ${pathname === "/admin/users" ? "active" : ""}`}
+                                    >
+                                        Admin
+                                    </Link>
+                                }
                                 <Link
                                     href={isUserLoggedIn ? '/myaccount' : '/login'}
                                     className={`${linkClasses} ${isUserLoggedIn && pathname === '/myaccount' ? 'active' : ''}`}

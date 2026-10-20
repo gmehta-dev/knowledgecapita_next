@@ -10,7 +10,7 @@
  */
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { ADMIN } from './fixtures.mjs';
+import { ADMIN, SUPER_ADMIN } from './fixtures.mjs';
 
 const SOURCE_URI = process.env.SOURCE_URI || 'mongodb://localhost:27017/sharecom';
 const TEST_URI = process.env.TEST_URI || 'mongodb://localhost:27017/sharecom_contract_test';
@@ -58,6 +58,19 @@ await users.insertOne({
   phone_number: ADMIN.phone_number,
   password: await bcrypt.hash(ADMIN.password, 12),
   name_visibility: 1, profile_visibility: 1, brief_bio_visibility: 1, experience_visibility: 1,
+  calender_visibility: 1, scheduling_visibility: 1, detailed_bio_visibility: 1,
+  created_at: new Date(), updated_at: new Date()
+});
+
+// Known super admin account - test DB only.
+await users.deleteMany({ $or: [{ email: SUPER_ADMIN.email }, { phone_number: SUPER_ADMIN.phone_number }] });
+await users.insertOne({
+  name: 'Contract Super Admin',
+  email: SUPER_ADMIN.email,
+  phone_number: SUPER_ADMIN.phone_number,
+  password: await bcrypt.hash(SUPER_ADMIN.password, 12),
+  role: 'super_admin',
+  name_visibility: 1, profile_visibility: 0, brief_bio_visibility: 1, experience_visibility: 1,
   calender_visibility: 1, scheduling_visibility: 1, detailed_bio_visibility: 1,
   created_at: new Date(), updated_at: new Date()
 });

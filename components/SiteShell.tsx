@@ -19,6 +19,7 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
     const [mounted, setMounted] = useState<boolean>(false)
     const [isLoader, setIsLoader] = useState<boolean>(false)
     const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(false)
+    const [isSuperAdmin, setIsSuperAdmin] = useState<boolean>(false)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [contentData, setContentData] = useState<any>(null)
     const [authData, setAuthData] = useState<AuthData | null>(null)
@@ -28,6 +29,7 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         setMounted(true)
         setIsUserLoggedIn(Auth.isUserAuthenticated())
+        setIsSuperAdmin(Auth.loggedInUser()?.role === "super_admin")
     }, [pathname])
 
     // Fetched at runtime (not bundled) so the JSON files can still be edited on the server.
@@ -43,10 +45,10 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
     }, [])
 
     return (
-        <SiteLayoutContext.Provider value={{ isLoader, setIsLoader, isUserLoggedIn, setIsUserLoggedIn, contentData, authData }}>
+        <SiteLayoutContext.Provider value={{ isLoader, setIsLoader, isUserLoggedIn, setIsUserLoggedIn, isSuperAdmin, contentData, authData }}>
             <div className="main-layout">
                 {(isLoader || !mounted) && <FullScreenLoader />}
-                <Header isUserLoggedIn={isUserLoggedIn} />
+                <Header isUserLoggedIn={isUserLoggedIn} isSuperAdmin={isUserLoggedIn && isSuperAdmin} />
                 <main className="main-content">
                     {mounted && children}
                 </main>

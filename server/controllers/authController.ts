@@ -15,7 +15,8 @@ const formatUserResponse = (user: any) => ({
   designation: user.designation || null,
   industry: user.industry || null,
   area_of_specialization: user.area_of_specialization || null,
-  profile_image: user.profile_image || null
+  profile_image: user.profile_image || null,
+  role: user.role || 'user'
 });
 
 // POST /auth/sign-up
