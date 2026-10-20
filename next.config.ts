@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
   sassOptions: {
     // Bootstrap 5.3 SCSS emits deprecation warnings on newer Dart Sass.
     quietDeps: true,
-    silenceDeprecations: ["import", "global-builtin", "color-functions", "mixed-decls"],
+    silenceDeprecations: ["legacy-js-api", "import", "global-builtin", "color-functions"],
   },
 };
 

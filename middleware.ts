@@ -36,7 +36,7 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: '/api/:path*',
-  // Read ALLOWED_ORIGINS at runtime (not inlined at build time).
-  runtime: 'nodejs'
+  // Default (edge) runtime: it streams request bodies, whereas the nodejs middleware
+  // runtime buffers them with a size cap that truncates file uploads.
+  matcher: '/api/:path*'
 };

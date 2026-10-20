@@ -1,0 +1,133 @@
+{
+    "dropdowns": {
+        "industry": [
+            "Academia",
+            "Agriculture & Allied Sector",
+            "Automobile",
+            "Aviation",
+            "BFSI, Investment & Trading",
+            "Chemicals",
+            "Design",
+            "Defense",
+            "Education",
+            "Engineering & Construction",
+            "FMCG",
+            "Healthcare & Life Sciences",
+            "IT Services & Consulting",
+            "Media Production & Entertainment",
+            "Metals & Mining",
+            "NGO/ Social Services",
+            "Oil & Gas",
+            "Power",
+            "Professional Services",
+            "Real Estate",
+            "Retail",
+            "Space",
+            "Sports, Fitness & Personal Care",
+            "Telecom",
+            "Textiles & Apparel",
+            "Tourism & Hospitality",
+            "Transportation & Warehousing",
+            "Utilities",
+            "Others"
+        ],
+        "designation": [
+            "Assistant Professor",
+            "Associate Professor",
+            "Chairman",
+            "Chief Executive Officer (CEO)",
+            "Chief Financial Officer (CFO)",
+            "Chief Human Resource Officer (CHRO)",
+            "Chief Information Officer (CIO)",
+            "Chief Information Security Officer (CISO)",
+            "Chief Innovation Officer (CIO)",
+            "Chief Investment Officer (CIO)",
+            "Chief Marketing Officer (CMO)",
+            "Chief Operating Officer (COO)",
+            "Chief Quality Officer (CQO)",
+            "Chief Scientific Officer (CSO)",
+            "Chief Sustainability Officer (CSO)",
+            "Chief Strategy Officer (CSO)",
+            "Chief Technology Officer (CTO)",
+            "Consultant",
+            "Director",
+            "Founder",
+            "General Counsel",
+            "Head- EHS",
+            "Managing Director",
+            "PhD Scholar",
+            "President",
+            "Professor",
+            "Sales Head",
+            "Vice- Chancellor",
+            "Vice-President",
+            "Others"
+        ],
+        "area_of_specialization": [
+            "Applied Mechanics",
+            "Artificial Engineering",
+            "Aviation & Aerospace",
+            "Biochemical Engineering and Biotechnology",
+            "Biomedical",
+            "Business Technology",
+            "Chemical Engineering",
+            "Chemistry",
+            "Civil Engineering",
+            "Computer Science & Engineering",
+            "CSR & Social Service",
+            "Design",
+            "Economics & Public Policy",
+            "Electrical Engineering",
+            "Entrepreneurship",
+            "Environment, Health & Safety",
+            "Finance & Accounts",
+            "General Administration",
+            "General Management",
+            "Human Resource Management",
+            "Humanities & Social Sciences",
+            "Information Security",
+            "Information Systems",
+            "Innovation",
+            "Legal & Regulatory",
+            "Material Science & Engineering",
+            "Mathematics",
+            "Mechanical Engineering",
+            "Operations",
+            "Physics",
+            "Product Management",
+            "Project & Program Management",
+            "Quality Management",
+            "R&D",
+            "Risk Management & Compliance",
+            "Sales & Marketing",
+            "Strategy",
+            "Supply Chain Management",
+            "Sustainability",
+            "Others"
+        ]
+    },
+    "about": {
+        "first-content": {
+            "data": "Knowledge Capita is a centralized platform to provide an opportunity to the academicians and the industry leaders to find the best minds of the world who can make an impact on their organization’s or self-professional growth drivers. It aims to amplify the knowledge capita of the world by connecting leading minds across the globe to work on their mutual areas of interest. Here is how we support."
+        },
+        "list": [
+            {
+                "content": "Expand your collaboration horizon on a centralized platform."
+            },
+            {
+                "content": "Explore partnerships for you and get the right audience for your talks."
+            },
+            {
+                "content": "One-o-One connect with the other CXOs and top academia leaders across the globe."
+            },
+            {
+                "content": "Managing your calendar better while you on the move. Let’s make this world a better place to live."
+            }
+        ],
+        "second-content": {
+            "data1": "Atul Bijawat is a seasoned business leader with nearly two decades of experience in the field of Sales, Marketing, Operations, P&L Management, and Consulting in multiple industrial domains of EVs, Software, Construction & Building Materials, and Telecom.",
+            "data2": " Atul is known as one of the sharpest mind in the digital marketing space. His endeavour is now to create an interface platform between the industry and academia to lift the overall knowledge capita of the world.",
+            "data3": "He holds a B.E. degree from Delhi College of Engineering and PGDM/MBA from IIM Kozhikode."
+        }
+    }
+}
