@@ -28,7 +28,7 @@ export default function ContactUsPage() {
         <div className="container py-4">
             <div className="text-center mb-4">
                 <h1 className="fs-4 fw-bold">Contact Us</h1>
-                <p className="text-muted small">Have questions? We'd love to hear from you.</p>
+                <p className="text-muted small">Have questions? We&apos;d love to hear from you.</p>
             </div>
             <div className="row justify-content-center">
                 <div className="col-lg-8">

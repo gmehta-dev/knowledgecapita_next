@@ -11,7 +11,7 @@ export default function NotFoundPage() {
             <div>
                 <div className="error-code">404</div>
                 <div className="error-title">Page Not Found</div>
-                <p className="error-text">The page you're looking for doesn't exist or has been moved.</p>
+                <p className="error-text">The page you&apos;re looking for doesn&apos;t exist or has been moved.</p>
                 <Link href="/" className="btn btn-primary">Back to Home</Link>
             </div>
         </div>

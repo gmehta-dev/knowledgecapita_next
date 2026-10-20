@@ -202,7 +202,7 @@ export default function ProfileDetail() {
                                                 <polyline points="10 9 9 9 8 9"/>
                                             </svg>
                                             <h3>No Bio Available</h3>
-                                            <p>This profile doesn't have a brief bio yet.</p>
+                                            <p>This profile doesn&apos;t have a brief bio yet.</p>
                                         </div>
                                     )}
                                 </div>
@@ -227,7 +227,7 @@ export default function ProfileDetail() {
                                                 <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
                                             </svg>
                                             <h3>No Experience Listed</h3>
-                                            <p>Experience details haven't been added yet.</p>
+                                            <p>Experience details haven&apos;t been added yet.</p>
                                         </div>
                                     )}
                                 </div>
