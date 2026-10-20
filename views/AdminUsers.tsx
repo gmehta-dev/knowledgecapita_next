@@ -10,6 +10,7 @@ import 'react-quill-new/dist/quill.snow.css'
 import Input from "@/components/Input"
 import Auth from "@/lib/Auth"
 import { axiosInstance } from "@/lib/axios-config"
+import { mediaUrl, replaceLogo } from "@/lib/helper"
 import { useNavigate } from "@/lib/navigation"
 import { useLayoutContext } from "@/lib/layout-context"
 import { LayoutContext } from "@/lib/types"
@@ -28,6 +29,7 @@ type AdminUser = {
     industry?: string
     area_of_specialization?: string
     profile_visibility?: number
+    profile_image?: string
     role: "user" | "super_admin"
     created_at?: string
 }
@@ -44,6 +46,20 @@ type EditForm = {
     profile_visibility: boolean
     password: string
 }
+
+/** Profile photo, falling back to the placeholder (same as the directory cards). */
+const Avatar = ({ src, size }: { src?: string; size: number }) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+        src={src ? mediaUrl + src : "/assets/images/placeholder.jpg"}
+        onError={replaceLogo}
+        alt=""
+        width={size}
+        height={size}
+        className="rounded-circle border"
+        style={{ objectFit: "cover", flexShrink: 0 }}
+    />
+)
 
 /** Keeps a user's current (possibly legacy) value selectable even if it is no longer in the list. */
 const withCurrent = (options: string[] = [], current?: string) =>
@@ -170,6 +186,7 @@ export default function AdminUsersPage() {
                 <table className="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
+                            <th style={{ width: 56 }}>Photo</th>
                             <th>Name</th>
                             <th>Email</th>
                             <th>Phone</th>
@@ -181,13 +198,14 @@ export default function AdminUsersPage() {
                     </thead>
                     <tbody>
                         {isLoading && (
-                            <tr><td colSpan={7} className="text-center py-4 text-muted">Loading…</td></tr>
+                            <tr><td colSpan={8} className="text-center py-4 text-muted">Loading…</td></tr>
                         )}
                         {!isLoading && users.length === 0 && (
-                            <tr><td colSpan={7} className="text-center py-4 text-muted">No users found</td></tr>
+                            <tr><td colSpan={8} className="text-center py-4 text-muted">No users found</td></tr>
                         )}
                         {!isLoading && users.map((u) => (
                             <tr key={u.id}>
+                                <td><Avatar src={u.profile_image} size={40} /></td>
                                 <td className="fw-semibold">{u.name}</td>
                                 <td>{u.email}</td>
                                 <td>{u.phone_number}</td>
@@ -228,6 +246,13 @@ export default function AdminUsersPage() {
                 <Modal.Body>
                     {editing && (
                         <form onSubmit={handleSubmit(saveEdit)}>
+                            <div className="d-flex align-items-center gap-3 mb-3">
+                                <Avatar src={editing.profile_image} size={72} />
+                                <div>
+                                    <div className="fw-semibold">{editing.name}</div>
+                                    <div className="text-muted small">{editing.email}</div>
+                                </div>
+                            </div>
                             <div className="row">
                                 <div className="col-md-6">
                                     <Input id="name" required label="Name" type="text" inputError={errors.name?.message} {...register("name", { required: 'Name is required' })} />
