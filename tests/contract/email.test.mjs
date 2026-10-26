@@ -75,7 +75,7 @@ const call = (method, path, body) =>
 
 const uniq = `${Date.now()}${Math.floor(Math.random() * 1000)}`;
 const USER = {
-  name: `Reset <b>Tester</b> ${uniq}`,
+  name: `<b>Tester</b> Reset ${uniq}`, // first name holds HTML: must be escaped in emails
   email: `reset.${uniq}@example.com`,
   phone_number: `7${uniq.slice(-9)}`,
   password: 'old-password-1'
@@ -222,6 +222,19 @@ describe('contact form notification', () => {
     assert.ok(mail.body.includes(`Hello from ${uniq}`));
     assert.ok(mail.body.includes('9876543210'));
     assert.ok(await db.collection('contactmessages').findOne({ query: `Hello from ${uniq}` }), 'saved in the database');
+  });
+
+  it('message HTML is escaped, line breaks kept, text version included', async () => {
+    const n = mails.length;
+    const query = `Line one <script>alert(1)</script>\nLine two ${uniq}`;
+    assert.equal((await call('POST', '/contact', { name: 'Html Tester', email: `h.${uniq}@example.com`, contact_no: '9876543210', query })).status, 200);
+    const mail = await nextMail(n);
+    assert.ok(mail);
+    const html = mail.body.slice(mail.body.indexOf('text/html'));
+    assert.ok(html.includes('&lt;script&gt;alert(1)&lt;/script&gt;'), 'escaped in HTML');
+    assert.ok(!html.includes('<script>'), 'no raw script in HTML');
+    assert.ok(html.includes('white-space:pre-wrap'), 'line breaks preserved');
+    assert.ok(mail.body.includes('text/plain'), 'has a plain-text part');
   });
 
   it('a name with line breaks cannot add email headers', async () => {

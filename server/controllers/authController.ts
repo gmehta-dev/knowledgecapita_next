@@ -7,7 +7,8 @@ import { ApiError } from '../errors';
 import { json, readBody, validate } from '../http';
 import { generateToken, requireUser } from '../auth';
 import { signUpSchema, signInSchema, passResetSchema, passResetConfirmSchema, passChangeSchema } from '../validators/authValidator';
-import { sendMail, escapeHtml } from '../mail';
+import { sendMail } from '../mail';
+import { welcomeEmail, passwordResetEmail } from '../emailTemplates';
 import { SITE_URL } from '@/lib/site';
 
 const RESET_TTL_MS = 60 * 60 * 1000; // reset links work for 1 hour
@@ -53,23 +54,7 @@ export async function signUp(req: NextRequest) {
   const user = await User.create({ name, email, phone_number, password });
 
   // Welcome email. Not awaited: sign-up must not wait for (or fail on) the mail server.
-  void sendMail({
-    to: user.email,
-    subject: 'Welcome to KNOWLEDGE CAPITA',
-    text:
-      `Hi ${user.name},\n\n` +
-      `Welcome to KNOWLEDGE CAPITA! Your account has been created.\n\n` +
-      `Log in and complete your profile so other members can find you:\n${SITE_URL}/login\n\n` +
-      `If you didn't create this account, please reply to this email and let us know.\n\n` +
-      `KNOWLEDGE CAPITA`,
-    html:
-      `<p>Hi ${escapeHtml(user.name)},</p>` +
-      `<p>Welcome to KNOWLEDGE CAPITA! Your account has been created.</p>` +
-      `<p>Log in and complete your profile so other members can find you:</p>` +
-      `<p><a href="${SITE_URL}/login" style="display:inline-block;padding:10px 18px;background:#1a56db;color:#fff;border-radius:6px;text-decoration:none">Log in</a></p>` +
-      `<p>If you didn't create this account, please reply to this email and let us know.</p>` +
-      `<p>KNOWLEDGE CAPITA</p>`
-  });
+  void sendMail({ to: user.email, ...welcomeEmail(user.name) });
 
   return json({ message: 'Registration successful' }, 201);
 }
@@ -132,25 +117,8 @@ export async function passReset(req: NextRequest) {
   );
 
   const link = `${SITE_URL}/reset-password?token=${token}`;
-  const name = user.name || 'there';
   // Not awaited: the response time must not depend on the mail server.
-  void sendMail({
-    to: user.email,
-    subject: 'Reset your KNOWLEDGE CAPITA password',
-    text:
-      `Hi ${name},\n\n` +
-      `We received a request to reset the password for your KNOWLEDGE CAPITA account.\n\n` +
-      `Set a new password here (the link works once and expires in 1 hour):\n${link}\n\n` +
-      `If you didn't ask for this, you can ignore this email. Your password stays the same.\n\n` +
-      `KNOWLEDGE CAPITA`,
-    html:
-      `<p>Hi ${escapeHtml(name)},</p>` +
-      `<p>We received a request to reset the password for your KNOWLEDGE CAPITA account.</p>` +
-      `<p><a href="${link}" style="display:inline-block;padding:10px 18px;background:#1a56db;color:#fff;border-radius:6px;text-decoration:none">Set a new password</a></p>` +
-      `<p>The link works once and expires in 1 hour. If the button doesn't work, copy this address into your browser:<br>${link}</p>` +
-      `<p>If you didn't ask for this, you can ignore this email. Your password stays the same.</p>` +
-      `<p>KNOWLEDGE CAPITA</p>`
-  });
+  void sendMail({ to: user.email, ...passwordResetEmail(user.name, link) });
 
   return json({ message: RESET_SENT });
 }

@@ -3,7 +3,8 @@ import type { NextRequest } from 'next/server';
 import ContactMessage from '../models/ContactMessage';
 import { json, readBody, validate } from '../http';
 import { contactSchema } from '../validators/contactValidator';
-import { sendMail, oneLine } from '../mail';
+import { sendMail } from '../mail';
+import { contactNotificationEmail } from '../emailTemplates';
 
 // POST /contact
 export async function submitContact(req: NextRequest) {
@@ -16,12 +17,7 @@ export async function submitContact(req: NextRequest) {
   // Notify the site owner (the message is already saved, so a mail failure loses nothing).
   const notifyTo = process.env.CONTACT_NOTIFY_TO || process.env.SMTP_USER;
   if (notifyTo) {
-    void sendMail({
-      to: notifyTo,
-      replyTo: email,
-      subject: `New contact message from ${oneLine(name)}`,
-      text: `Name:  ${name}\nEmail: ${email}\nPhone: ${contact_no}\n\n${query}\n\n(Reply to this email to answer ${oneLine(name)} directly.)`
-    });
+    void sendMail({ to: notifyTo, replyTo: email, ...contactNotificationEmail({ name, email, contact_no, query }) });
   }
 
   return json({ message: 'Message sent successfully' });
