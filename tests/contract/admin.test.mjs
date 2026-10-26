@@ -101,14 +101,27 @@ describe('only super admin can manage users', () => {
 
 describe('list / get', () => {
   it('lists all users including hidden profiles, with contact details', async () => {
-    const r = await call('GET', `/admin/users?searching=${encodeURIComponent(SUPER_ADMIN.email)}`, { token: s.superToken });
+    assert.equal((await call('PUT', `/admin/users/${s.t1}`, { token: s.superToken, body: { profile_visibility: 0 } })).status, 200);
+    const r = await call('GET', `/admin/users?searching=${encodeURIComponent(T1.email)}`, { token: s.superToken });
     assert.equal(r.status, 200);
     assert.equal(r.json.total, 1); // profile_visibility 0, still listed
     const u = r.json.data[0];
-    assert.equal(u.email, SUPER_ADMIN.email);
-    assert.equal(u.phone_number, SUPER_ADMIN.phone_number);
-    assert.equal(u.id, s.superId);
+    assert.equal(u.email, T1.email);
+    assert.equal(u.phone_number, T1.phone_number);
+    assert.equal(u.id, s.t1);
+    assert.equal(u.profile_visibility, 0);
     assert.equal(u.password, undefined);
+    assert.equal((await call('PUT', `/admin/users/${s.t1}`, { token: s.superToken, body: { profile_visibility: 1 } })).status, 200);
+  });
+
+  it('super admins are not listed', async () => {
+    const r = await call('GET', `/admin/users?searching=${encodeURIComponent(SUPER_ADMIN.email)}`, { token: s.superToken });
+    assert.equal(r.status, 200);
+    assert.equal(r.json.total, 0);
+    const all = await call('GET', '/admin/users?size=100', { token: s.superToken });
+    assert.ok(all.json.data.every((x) => x.role !== 'super_admin'));
+    // still reachable directly (e.g. to edit your own account)
+    assert.equal((await call('GET', `/admin/users/${s.superId}`, { token: s.superToken })).status, 200);
   });
 
   it('search by phone; regex characters are treated literally', async () => {
@@ -182,7 +195,9 @@ describe('update', () => {
     const t2 = await signIn(T2.email, T2.password);
     assert.equal(t2.json.user.role, 'super_admin');
     assert.equal((await call('GET', '/admin/users', { token: t2.json.token })).status, 200);
+    assert.equal((await call('GET', `/admin/users?searching=${T2.phone_number}`, { token: s.superToken })).json.total, 0); // hidden while super admin
     assert.equal((await call('PUT', `/admin/users/${s.t2}`, { token: s.superToken, body: { role: 'user' } })).status, 200);
+    assert.equal((await call('GET', `/admin/users?searching=${T2.phone_number}`, { token: s.superToken })).json.total, 1); // listed again
     // Same token, role re-read from DB on every request -> access revoked immediately
     assert.equal((await call('GET', '/admin/users', { token: t2.json.token })).status, 403);
   });

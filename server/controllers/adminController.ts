@@ -16,7 +16,7 @@ async function requireSuperAdmin(req: NextRequest) {
 }
 
 // GET /admin/users?page=&size=&searching=
-// All users, including hidden profiles. `searching` matches name, email or phone.
+// All users except super admins, including hidden profiles. `searching` matches name, email or phone.
 export async function listUsers(req: NextRequest) {
   await requireSuperAdmin(req);
 
@@ -26,7 +26,7 @@ export async function listUsers(req: NextRequest) {
   const searching = params.get('searching')?.trim();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const query: Record<string, any> = {};
+  const query: Record<string, any> = { role: { $ne: SUPER_ADMIN } }; // documents without a role are users
   if (searching) {
     const pattern = { $regex: escapeRegex(searching), $options: 'i' };
     query.$or = [{ name: pattern }, { email: pattern }, { phone_number: pattern }];
