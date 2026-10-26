@@ -210,3 +210,19 @@ a `[mail]` warning is logged; a mail failure never fails the request.
 | `POST /api/contact` | Notification to `CONTACT_NOTIFY_TO` (default `SMTP_USER`) with Reply-To set to the sender. The message is still saved in `contactmessages` first. |
 
 Tests: `npm run test:email` (captures mail with a local SMTP sink; see the file header).
+
+## Bio sanitizing (stored XSS fix)
+
+`brief_bio`, `experience` and `detailed_bio` are shown as HTML on profile pages.
+`server/sanitize.ts` (sanitize-html) keeps only the formatting bios use
+(paragraphs, bold/italic/underline/strike, links, lists, headings, text colour,
+Quill alignment/indent classes) and removes scripts, event handlers, iframes,
+images, forms, `javascript:`/`data:` links and CSS `url()`/`expression()`.
+Links get `target="_blank" rel="noopener noreferrer nofollow"`.
+
+Applied when saving (`POST /api/user/profile`, `PUT /api/admin/users/:id`) and
+when serving (`/api/dashboard/:pid`, the `/profile/...` page, `/api/user/profile`,
+`/api/admin/users/:id`), so bios stored before the fix are safe without changing
+the database. Compared against all stored bios: no visible change (only style
+whitespace, undefined `var(...)` colours and Quill cursor leftovers differ).
+Tests: `npm run test:sanitize`.

@@ -5,6 +5,7 @@ import { ApiError } from '../errors';
 import { json, readBody, validate } from '../http';
 import { requireUser } from '../auth';
 import { profileSchema } from '../validators/profileValidator';
+import { sanitizeRichTextFields } from '../sanitize';
 
 // GET /user/profile
 export async function getProfile(req: NextRequest) {
@@ -15,7 +16,7 @@ export async function getProfile(req: NextRequest) {
     throw new ApiError(404, 'User not found');
   }
 
-  return json({ data: user });
+  return json({ data: sanitizeRichTextFields(user.toJSON()) });
 }
 
 // POST /user/profile
@@ -68,6 +69,8 @@ export async function updateProfile(req: NextRequest) {
   if (calender_visibility !== undefined) updateData.calender_visibility = calender_visibility;
   if (scheduling_visibility !== undefined) updateData.scheduling_visibility = scheduling_visibility;
   if (detailed_bio_visibility !== undefined) updateData.detailed_bio_visibility = detailed_bio_visibility;
+
+  sanitizeRichTextFields(updateData);
 
   await User.findByIdAndUpdate(authUser._id, updateData, {
     new: true,

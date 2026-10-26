@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import User from './models/User';
 import CalendarEntry from './models/CalendarEntry';
 import { connectDB } from './db';
+import { sanitizeRichText } from './sanitize';
 
 /**
  * Public profile as returned by GET /dashboard/:pid (legacy visibility rules).
@@ -23,13 +24,13 @@ export async function buildPublicProfile(user: any) {
 
   // Add fields based on visibility
   if (user.brief_bio_visibility === 1) {
-    data.brief_bio = user.brief_bio;
+    data.brief_bio = sanitizeRichText(user.brief_bio);
   }
   if (user.experience_visibility === 1) {
-    data.experience = user.experience;
+    data.experience = sanitizeRichText(user.experience);
   }
   if (user.detailed_bio_visibility === 1) {
-    data.detailed_bio = user.detailed_bio;
+    data.detailed_bio = sanitizeRichText(user.detailed_bio);
   }
   if (user.scheduling_visibility === 1) {
     data.scheduling_assistance = user.scheduling_assistance;

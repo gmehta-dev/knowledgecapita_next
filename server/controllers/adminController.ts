@@ -6,6 +6,7 @@ import { ApiError } from '../errors';
 import { assertObjectId, json, readBody, validate } from '../http';
 import { assertSuperAdmin, requireUser, SUPER_ADMIN } from '../auth';
 import { adminUserUpdateSchema } from '../validators/adminValidator';
+import { sanitizeRichTextFields } from '../sanitize';
 
 const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -58,7 +59,7 @@ export async function getUser(req: NextRequest, id: string) {
     throw new ApiError(404, 'User not found');
   }
 
-  return json({ data: user });
+  return json({ data: sanitizeRichTextFields(user.toJSON()) });
 }
 
 // PUT /admin/users/:id
@@ -95,6 +96,7 @@ export async function updateUser(req: NextRequest, id: string) {
   }
 
   // `save()` (not findByIdAndUpdate) so the password is hashed by the pre-save hook.
+  sanitizeRichTextFields(body);
   user.set(body);
   await user.save();
 
